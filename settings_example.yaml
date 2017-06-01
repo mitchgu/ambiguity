@@ -1,0 +1,47 @@
+chrome_profile_dir: ~/.scd/chrome_profile
+chrome_download_dir: ~/.scd/chrome_downloads
+library_dir: library
+credential_provider:
+  provider_type: stdin
+accounts:
+  - name: mitfcu_checking
+    acct_type: MITFCU
+    cred_name: MITFCU
+    open_date: 2014-10-30
+    statement_day: 17
+    ignore:
+      2014-11: # Ignore this month when pulling statements
+    subaccount: 5
+    description: Checking
+  - name: mitfcu_savings
+    acct_type: MITFCU
+    cred_name: MITFCU
+    open_date: 2014-10-30
+    statement_day: 18
+    subaccount: 1
+    description: Savings
+  - name: mitfcu_visa_1234
+    acct_type: MITFCU_Visa
+    cred_name: MITFCU
+    open_date: 2015-10-25
+    statement_day: 19
+    last_four_digits: "1234"
+  - name: boa_checking
+    acct_type: BoA
+    cred_name: Bank of America
+    open_date: 2016-08-03
+    statement_day: 20
+    last_four_digits: "0701"
+  - name: boa_visa_2468
+    acct_type: BoAVisa
+    cred_name: Bank of America
+    open_date: 2016-09-24
+    statement_day: 21
+    last_four_digits: "2468"
+  - name: mitfcu_visa_5678
+    acct_type: MITFCU_Visa
+    active: False  # This card account is closed
+    cred_name: MITFCU
+    open_date: 2014-10-30
+    statement_day: 22
+    last_four_digits: "5678"

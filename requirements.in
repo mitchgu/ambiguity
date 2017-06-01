@@ -1,0 +1,5 @@
+pykeepass
+selenium==3.4.1
+pypdf2===1.26.0
+PyYAML==3.12
+pylint
