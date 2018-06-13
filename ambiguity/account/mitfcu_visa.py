@@ -32,8 +32,7 @@ class MITFCUVisa(Account):
         "username": "input#userid",
         "password": "input#password",
         "login": "button[type=submit]",
-        "dash_frame": "uspbody",
-        "account_link": "a[data-name='XXXXXXXXXXXX{}']",
+        "account_link": "a[title='XXXXXXXXXXXX{} *{}']",
         "mycardinfo_home": "#user-summary",
         "pdf_stmt_link": "table.estatements-list a",
         "date_picker": "#selected-date",
@@ -55,9 +54,9 @@ class MITFCUVisa(Account):
         scd.find(self.SELECTORS["login"]).click()
 
         # Navigate to mycardinfo
-        scd.wait_till_frame(self.SELECTORS["dash_frame"])
         scd.wait_till_clickable(self.SELECTORS["account_link"].format(
-            self.last_four_digits)).click()
+                self.last_four_digits,
+                self.last_four_digits)).click()
         scd.close()
         scd.switch_to.window(scd.window_handles[0])
         scd.wait_till_visible(self.SELECTORS["mycardinfo_home"])

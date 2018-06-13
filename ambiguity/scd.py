@@ -22,7 +22,10 @@ class SimpleChromeDriver(webdriver.Chrome):
         self.download_dir = download_dir
         self.profile_dir = profile_dir
         self.chrome_options = webdriver.ChromeOptions()
-        prefs = {"download.default_directory": str(download_dir.absolute())}
+        prefs = {
+            "download.default_directory": str(download_dir.absolute()),
+            "plugins.always_open_pdf_externally": True
+        }
         self.chrome_options.add_experimental_option("prefs", prefs)
         self.chrome_options.add_argument(
             "user-data-dir=" + str(profile_dir.absolute()))
@@ -88,6 +91,14 @@ class SimpleChromeDriver(webdriver.Chrome):
         """Wait till the given frame is available, then switch to it"""
         return self.wait_on_ec(
             EC.frame_to_be_available_and_switch_to_it(frame_name))
+
+    def wait_till_alert(self):
+        return self.wait_on_ec(EC.alert_is_present())
+
+    def accept_alert(self):
+        self.wait_till_alert()
+        alert = self.switch_to.alert
+        alert.accept()
 
     def scroll_to(self, element):
         """move to element then click it"""

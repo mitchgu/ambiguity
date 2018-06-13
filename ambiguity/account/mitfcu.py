@@ -32,9 +32,8 @@ class MITFCU(Account):
         "username": "input#userid",
         "password": "input#password",
         "login": "button[type=submit]",
-        "additional_services": "a[data-app-code='Additional Services']",
-        "e-deposits": "a[data-app-code='e-Deposits']",
-        "dash_frame": "uspbody",
+        "additional_services": "a[aria-label='Additional Services']",
+        "e-statements": "a[aria-label='e-Statements']",
         "estmt_btn": "input[type='BUTTON']",
         "cow_frame": "content",
         "viewer_link": "b a",
@@ -64,9 +63,10 @@ class MITFCU(Account):
             print("Press Enter when you're done")
             input()
             scd.find(self.SELECTORS["additional_services"]).click()
-        scd.find(self.SELECTORS["e-deposits"]).click()
-        scd.wait_till_frame(self.SELECTORS["dash_frame"])
-        scd.find(self.SELECTORS["estmt_btn"]).click()
+        scd.find(self.SELECTORS["e-statements"]).click()
+
+        scd.accept_alert()
+
         scd.close()
         scd.switch_to.window(scd.window_handles[0])
         scd.wait_till_frame(self.SELECTORS["cow_frame"])
