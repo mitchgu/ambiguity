@@ -32,8 +32,21 @@ class CredentialProvider(metaclass=abc.ABCMeta):
 class KeepassCP(CredentialProvider):
     """Concrete credential provider for keepass databases"""
 
-    def __init__(self, kdbx_file):
+    def __init__(self, kdbx_file, keyfile=None):
         self.kdbx_file = Path(kdbx_file).expanduser()
+        if not self.kdbx_file.exists():
+            raise FileNotFoundError(
+                "Could not find keepass database at {}".format(
+                        self.kdbx_file.absolute()))
+        if keyfile:
+            self.keyfile = Path(keyfile).expanduser()
+            if not self.keyfile.exists():
+                raise FileNotFoundError(
+                    "Could not find keepass keyfile at {}".format(
+                        self.keyfile.absolute()))
+        else:
+            self.keyfile = None
+        print(self.kdbx_file.absolute(), self.keyfile.absolute())
 
     @property
     def kdbx(self):
@@ -42,14 +55,15 @@ class KeepassCP(CredentialProvider):
             for _ in range(3):
                 kdbx_pass = getpass.getpass("Keepass password: ")
                 try:
-                    setattr(self, "__lazy_kdbx", PyKeePass(
-                        str(self.kdbx_file.absolute()), password=kdbx_pass))
+                    if self.keyfile:
+                        keepass_db = PyKeePass(str(self.kdbx_file.absolute()),
+                                               password=kdbx_pass,
+                                               keyfile=str(self.keyfile.absolute()))
+                    else:
+                        keepass_db = PyKeePass(str(self.kdbx_file.absolute()),
+                                               password=kdbx_pass)
+                    setattr(self, "__lazy_kdbx", keepass_db)
                     break
-                except FileNotFoundError:
-                    LOG.critical("Could not find keepass database at %s",
-                                 self.kdbx_file.absolute())
-                    import sys
-                    sys.exit()
                 except IOError:
                     print("Keepass unlock failed")
             else:
