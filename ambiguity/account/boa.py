@@ -18,7 +18,7 @@ class BoA(Account):
     SELECTORS = {
         "username": "input[name=onlineId1]",
         "password": "input[name=passcode1]",
-        "login": "button#hp-sign-in-btn",
+        "login": "button#signIn",
         "account_names": "span.AccountName a",
         "dl_modal": "a[name=download_transactions_top]",
         "txn_dropdown": "select#select_txnperiod, select#select_transaction",
@@ -28,6 +28,7 @@ class BoA(Account):
         "error_box": ".error-message-box",
         "pdf_page": 'a[title="Statements & Documents"]',
         "pdf_stmt": "a.statement-name",
+        "pdf_stmt_dates": "td.first.TL_NPI_L2",
         "pdf_dl_link": "div.ui-dialog-content a#menuOption3",
     }
 
@@ -118,11 +119,13 @@ class BoA(Account):
             scd.wait_till_clickable(self.SELECTORS["pdf_page"]).click()
             scd.wait_till_clickable(self.SELECTORS["pdf_stmt"])
             choices = scd.find_all(self.SELECTORS["pdf_stmt"])
-            for choice in choices:
+            choice_dates = scd.find_all(self.SELECTORS["pdf_stmt_dates"])
+            for i in range(len(choice_dates)):
+                choice_date = choice_dates[i]
+                choice = choices[i]
                 if "Statement" not in choice.text:
                     continue
-                dt_string = choice.text[:-10]
-                dt = datetime.datetime.strptime(dt_string, "%B %d, %Y")
+                dt = datetime.datetime.strptime(choice_date.text, "%m/%d/%Y")
                 sd = StatementDate.from_datetime(dt)
                 pdf_stmts[sd] = choice
             for sd in pdf_statements:
