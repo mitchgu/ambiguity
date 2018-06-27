@@ -63,6 +63,13 @@ class SimpleChromeDriver(webdriver.Chrome):
         field.clear()
         field.send_keys(value)
 
+    def fill_field_slow(self, selector, value):
+        field = self.find(selector)
+        field.clear()
+        for c in value:
+            field.send_keys(c)
+            sleep(0.02)
+
     @staticmethod
     def is_stale(element):
         """Checks if element is stale"""

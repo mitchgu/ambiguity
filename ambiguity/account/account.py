@@ -139,5 +139,7 @@ class Account(metaclass=abc.ABCMeta):
             return account.BoA(**kwargs)
         elif acct_type == "BoAVisa":
             return account.BoAVisa(**kwargs)
+        elif acct_type == "USBankVisa":
+            return account.USBankVisa(**kwargs)
         else:
             raise ValueError("Account type %s not supported", acct_type)

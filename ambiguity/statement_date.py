@@ -1,6 +1,6 @@
 """Helper class to represent a statement closing date"""
 from functools import total_ordering
-
+import datetime
 
 @total_ordering
 class StatementDate(object):
@@ -30,6 +30,9 @@ class StatementDate(object):
     def ym(self):
         """The year month representation of the instance"""
         return self.year * 12 + (self.month - 1)
+
+    def to_datetime(self, day):
+        return datetime.datetime(self.year, self.month, day)
 
     def __repr__(self):
         return "{}-{}".format(self.year, str(self.month).zfill(2))
