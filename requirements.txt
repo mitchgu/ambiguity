@@ -13,14 +13,14 @@ libkeepass==0.3.0         # via pykeepass
 lxml==4.2.1               # via libkeepass
 mccabe==0.6.1             # via pylint
 pyasn1==0.4.3             # via pysmb
-pycryptodome==3.6.1       # via libkeepass
-pykeepass==2.8.2
-pylint==1.9.2
-pypdf2===1.26.0
+pycryptodome==3.6.6       # via libkeepass
+pykeepass==2.8.2          # via -r requirements.in
+pylint==1.9.2             # via -r requirements.in
+pypdf2===1.26.0           # via -r requirements.in
 pysmb==1.1.23             # via easypysmb
 python-dateutil==2.7.3    # via pykeepass
-pyyaml==3.12
-selenium==4.0.0a3
+pyyaml==3.12              # via -r requirements.in
+selenium==4.0.0a3         # via -r requirements.in
 six==1.11.0               # via astroid, pylint, python-dateutil
 urllib3==1.25.7           # via selenium
 wrapt==1.10.11            # via astroid
