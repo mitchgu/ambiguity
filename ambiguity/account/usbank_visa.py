@@ -16,10 +16,10 @@ class USBankVisa(Account):
     BASE_URL = "https://usbank.com/"
     LOGOUT_URL = "https://onlinebanking.usbank.com/Auth/LogoutConfirmation"
     SELECTORS = {
-        "username": "#textPersonalId",
+        "username": "#aw-personal-id",
         "continue": "#btnContinue",
-        "password": "#txtPassword",
-        "login": "#btnLogin",
+        "password": "#aw-password",
+        "login": "#aw-log-in",
         "stmts_link": "#myaccount_BCCreditCardViewOnlineStatements a",
         "stmt_list": "#DocumentList",
         "stmt_links": "#DocumentList a",
@@ -42,16 +42,16 @@ class USBankVisa(Account):
         # Login
         scd.get(self.BASE_URL)
         scd.fill_field(self.SELECTORS["username"], credentials[0])
-        scd.wait_till_clickable(self.SELECTORS["continue"]).click()
+        scd.fill_field(self.SELECTORS["password"], credentials[1])
+        scd.wait_till_clickable(self.SELECTORS["login"]).click()
+        import pdb; pdb.set_trace()
         try:
-            scd.wait_till_clickable(self.SELECTORS["password"])
+            scd.wait_till_clickable(self.SELECTORS["dl_xactions"])
         except TimeoutException:
             print("Please verify your phone via SMS")
             print("Press Enter when you're done")
             input()
-            scd.wait_till_clickable(self.SELECTORS["password"])
-        scd.fill_field(self.SELECTORS["password"], credentials[1])
-        scd.wait_till_clickable(self.SELECTORS["login"]).click()
+            scd.wait_till_clickable(self.SELECTORS["dl_xactions"])
 
         pdf_statements = set()
         usbank_aux_statements = dict()
@@ -78,9 +78,10 @@ class USBankVisa(Account):
                     if not scd.find(self.SELECTORS["dl_format_menu"]).is_displayed():
                         scd.wait_till_clickable(self.SELECTORS["dl_format_btn"]).click()
                         scd.wait_till_visible(self.SELECTORS["dl_format_menu"])
-                        return scd.find_all(self.SELECTORS["dl_format_item"])
+                    return scd.find_all(self.SELECTORS["dl_format_item"])
 
                 for fmt in fmts:
+                    import pdb; pdb.set_trace()
                     fmt_items = ensure_fmt_menu_visible()
                     scd.clear_download_glob("*." + fmt)
                     if fmt == "csv":

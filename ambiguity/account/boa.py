@@ -46,11 +46,14 @@ class BoA(Account):
     # pylint: disable=too-many-branches, too-many-statements
     def do_pull(self, scd, credentials, statements, pull_current=False):
         scd.get(self.BASE_URL)
+        sleep(1)
         scd.fill_field(self.SELECTORS["username"], credentials[0])
         scd.fill_field(self.SELECTORS["password"], credentials[1])
+        sleep(0.5)
         scd.wait_till_clickable(self.SELECTORS["login"]).click()
 
         scd.wait_till_visible(self.SELECTORS["account_names"])
+        # import pdb; pdb.set_trace()
         for an in scd.find_all(self.SELECTORS["account_names"]):
             if an.text[-4:] == self.last_four_digits:
                 an.click()
@@ -115,29 +118,31 @@ class BoA(Account):
                     self.log_successful_pull(sd, fmt)
 
         if pdf_statements:
-            pdf_stmts = dict()
-            scd.wait_till_clickable(self.SELECTORS["pdf_page"]).click()
-            scd.wait_till_clickable(self.SELECTORS["pdf_stmt"])
-            choices = scd.find_all(self.SELECTORS["pdf_stmt"])
-            choice_dates = scd.find_all(self.SELECTORS["pdf_stmt_dates"])
-            for i in range(len(choice_dates)):
-                choice_date = choice_dates[i]
-                choice = choices[i]
-                if "Statement" not in choice.text:
-                    continue
-                dt = datetime.datetime.strptime(choice_date.text, "%m/%d/%Y")
-                sd = StatementDate.from_datetime(dt)
-                pdf_stmts[sd] = choice
-            for sd in pdf_statements:
-                if sd not in pdf_stmts:
-                    self.log_failed_pull(sd, "pdf")
-                    continue
-                scd.clear_download_glob("*.pdf")
-                scd.scroll_to(pdf_stmts[sd]).click()
-                scd.wait_till_clickable(self.SELECTORS["pdf_dl_link"]).click()
-                dl_path = scd.wait_for_download("*.pdf")
-                self.file_statement(dl_path, sd, "pdf")
-                self.log_successful_pull(sd, "pdf")
+            import pdb; pdb.set_trace()
+            # not supported anymore :()
+            # pdf_stmts = dict()
+            # scd.wait_till_clickable(self.SELECTORS["pdf_page"]).click()
+            # scd.wait_till_clickable(self.SELECTORS["pdf_stmt"])
+            # choices = scd.find_all(self.SELECTORS["pdf_stmt"])
+            # choice_dates = scd.find_all(self.SELECTORS["pdf_stmt_dates"])
+            # for i in range(len(choice_dates)):
+            #     choice_date = choice_dates[i]
+            #     choice = choices[i]
+            #     if "Statement" not in choice.text:
+            #         continue
+            #     dt = datetime.datetime.strptime(choice_date.text, "%m/%d/%Y")
+            #     sd = StatementDate.from_datetime(dt)
+            #     pdf_stmts[sd] = choice
+            # for sd in pdf_statements:
+            #     if sd not in pdf_stmts:
+            #         self.log_failed_pull(sd, "pdf")
+            #         continue
+            #     scd.clear_download_glob("*.pdf")
+            #     scd.scroll_to(pdf_stmts[sd]).click()
+            #     scd.wait_till_clickable(self.SELECTORS["pdf_dl_link"]).click()
+            #     dl_path = scd.wait_for_download("*.pdf")
+            #     self.file_statement(dl_path, sd, "pdf")
+            #     self.log_successful_pull(sd, "pdf")
 
         # Logout
         scd.get(self.LOGOUT_URL)

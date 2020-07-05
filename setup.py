@@ -25,7 +25,7 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=[
         "pykeepass",
-        "selenium==3.4.1",
+        "selenium==4.0.0a3",
         "pypdf2===1.26.0",
         "PyYAML==3.12",
     ],

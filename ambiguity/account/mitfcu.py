@@ -1,4 +1,5 @@
 """Account class for MITFCU"""
+from time import sleep
 from ambiguity import StatementDate
 from ambiguity.account import Account
 
@@ -56,13 +57,14 @@ class MITFCU(Account):
         scd.find(self.SELECTORS["login"]).click()
 
         # Navigate to E-Statement viewer
+        sleep(2)
         try:
             scd.find(self.SELECTORS["additional_services"]).click()
         except IndexError:
             print("Please confirm it's you and save this browser profile")
             print("Press Enter when you're done")
             input()
-            scd.find(self.SELECTORS["additional_services"]).click()
+        scd.find(self.SELECTORS["additional_services"]).click()
         scd.find(self.SELECTORS["e-statements"]).click()
 
         scd.accept_alert()

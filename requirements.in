@@ -1,5 +1,5 @@
 pykeepass
-selenium==3.12.0
+selenium==4.0.0a3
 pypdf2===1.26.0
 PyYAML==3.12
 pylint

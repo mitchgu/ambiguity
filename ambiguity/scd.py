@@ -5,7 +5,7 @@ import warnings
 
 from PyPDF2 import PdfFileMerger
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, JavascriptException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -70,6 +70,11 @@ class SimpleChromeDriver(webdriver.Chrome):
             field.send_keys(c)
             sleep(0.02)
 
+    def expand_shadow_element(self, element):
+        shadow_root = self.execute_script(
+            'return arguments[0].shadowRoot', element)
+        return shadow_root
+
     @staticmethod
     def is_stale(element):
         """Checks if element is stale"""
@@ -132,30 +137,40 @@ class SimpleChromeDriver(webdriver.Chrome):
         def switch_to_print_preview():
             """Switch to the print preview window, return whether successful"""
             for handle in self.window_handles[::-1]:
-                self.switch_to_window(handle)
-                for _ in range(100):
-                    try:
-                        if (self.find("html").get_attribute("id") ==
-                                "print-preview"):
-                            return True
-                    except StaleElementReferenceException:
-                        continue
-                    break
-                else:
-                    raise RuntimeError("Could not find print preview page")
+                self.switch_to.window(handle)
+                try:
+                    if (self.find("print-preview-app") is not None):
+                        return True
+                except IndexError:
+                    continue
             return False
+
+        def extract_pdf_id():
+            # Pull the pdf url from the print preview dialog
+            try:
+                iframe = self.execute_script(
+                    'return '
+                    'document.querySelector("print-preview-app").shadowRoot'
+                    '.querySelector("print-preview-preview-area").shadowRoot'
+                    '.querySelector("iframe")')
+                if iframe is None: return None
+                src = iframe.get_attribute("src")
+                print_url = re.compile(r"chrome://print/([0-9]+)/0/print\.pdf")
+                pdf_id = print_url.search(src).group(1)
+                return pdf_id
+            except JavascriptException:
+                return None
 
         if not preview_exists:
             self.execute_script("setTimeout(window.print, 0);")
 
-        with Timeout(error_message="could not find an open print preview"):
+        with Timeout(seconds=1000000000, error_message="could not find an open print preview"):
             while switch_to_print_preview() is False:
                 sleep(0.25)
-
-        # Pull the pdf url from the print preview dialog
-        src = self.wait_till_visible("iframe").get_attribute("src")
-        print_url = re.compile(r"chrome://print/([0-9]+)/0/print\.pdf")
-        pdf_id = print_url.search(src).group(1)
+            pdf_id = extract_pdf_id()
+            while pdf_id is None:
+                pdf_id = extract_pdf_id()
+                sleep(0.25)
 
         # Keep downloading pages until they're empty
         pdf_pages = []
@@ -183,14 +198,21 @@ class SimpleChromeDriver(webdriver.Chrome):
                 merger.write(fout)
 
         # Close dialog and return to original screen
-        self.wait_till_clickable("button.cancel").click()
-        self.switch_to_window(original_window_handle)
+        # import pdb; pdb.set_trace()
+        self.execute_script(
+            "return "
+            "document.querySelector('print-preview-app').shadowRoot."
+            "querySelector('print-preview-sidebar').shadowRoot."
+            "querySelector('print-preview-button-strip').shadowRoot."
+            "querySelector('cr-button.cancel-button')").click()
+        # self.wait_till_clickable("button.cancel").click()
+        self.switch_to.window(original_window_handle)
 
     def reset(self):
         """Clear all windows and cookies, leaving a new tab window"""
         while len(self.window_handles) > 1:
-            self.switch_to_window(self.window_handles[-1])
+            self.switch_to.window(self.window_handles[-1])
             self.close()
-        self.switch_to_window(self.window_handles[0])
+        self.switch_to.window(self.window_handles[0])
         self.get("chrome://newtab")
         self.delete_all_cookies()
