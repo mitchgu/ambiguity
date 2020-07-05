@@ -27,7 +27,7 @@ setup(
         "pykeepass",
         "selenium==4.0.0a3",
         "pypdf2===1.26.0",
-        "PyYAML==3.12",
+        "PyYAML==5.1",
     ],
     entry_points={
         "console_scripts": [
