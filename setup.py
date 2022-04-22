@@ -26,7 +26,7 @@ setup(
     install_requires=[
         "pykeepass",
         "selenium==4.0.0a3",
-        "pypdf2===1.26.0",
+        "pypdf2===1.27.5",
         "PyYAML==3.12",
     ],
     entry_points={
